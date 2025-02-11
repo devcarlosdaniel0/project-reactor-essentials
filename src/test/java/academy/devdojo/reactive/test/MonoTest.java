@@ -9,7 +9,7 @@ import reactor.test.StepVerifier;
 public class MonoTest {
 
     @Test
-    void test() {
+    void monoSubscriber() {
         String name = "Carlos Daniel";
         Mono<String> mono = Mono.just(name).log();
 
@@ -18,5 +18,30 @@ public class MonoTest {
         StepVerifier.create(mono)
                 .expectNext(name)
                 .verifyComplete();
+    }
+
+    @Test
+    void monoSubscriberConsumer() {
+        String name = "Carlos Daniel";
+        Mono<String> mono = Mono.just(name).log();
+
+        mono.subscribe(s -> log.info("Value: '{}'", s));
+        log.info("---------------");
+        StepVerifier.create(mono)
+                .expectNext(name)
+                .verifyComplete();
+    }
+
+    @Test
+    void monoSubscriberConsumerError() {
+        String name = "Carlos Daniel";
+        Mono<String> mono = Mono.just(name)
+                .map(s -> {throw new RuntimeException("Testing error mono");});
+
+        mono.subscribe(s -> log.info("Name: {}", s), s -> log.error(s.getMessage()));
+        log.info("---------------");
+        StepVerifier.create(mono)
+                .expectError(RuntimeException.class)
+                .verify();
     }
 }
