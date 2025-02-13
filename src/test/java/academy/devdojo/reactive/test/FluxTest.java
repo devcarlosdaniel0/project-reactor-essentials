@@ -23,7 +23,6 @@ public class FluxTest {
         Flux<Integer> fluxIntegers = Flux.range(1,5)
                 .log();
 
-
         fluxIntegers.subscribe(i -> log.info("Number: '{}'", i));
 
         log.info("--------------------------");
@@ -32,4 +31,6 @@ public class FluxTest {
                 .expectNext(1,2,3,4,5)
                 .verifyComplete();
     }
+
+    
 }
