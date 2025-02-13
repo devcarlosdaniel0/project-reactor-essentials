@@ -100,10 +100,52 @@ public class MonoTest {
                 Throwable::printStackTrace,
                 () -> log.info("Finished"));
 
-        log.info("---------------");
+    }
 
-        /* StepVerifier.create(mono)
-                .expectNext(name.toUpperCase())
-                .verifyComplete();*/
+    @Test
+    void monoDoOnError() {
+        Mono<Object> error = Mono.error(new IllegalArgumentException("Illegal Argument Exception Error"))
+                .doOnError(e -> log.error(e.getMessage()))
+                .doOnNext(s -> log.info("Executing doOnNext()"))
+                .log();
+
+        StepVerifier.create(error)
+                .expectError(IllegalArgumentException.class)
+                .verify();
+    }
+
+    @Test
+    void monoDoOnErrorResume() {
+        String name = "Carlos Daniel";
+
+        Mono<Object> error = Mono.error(new IllegalArgumentException("Illegal Argument Exception Error"))
+                .doOnError(e -> log.error("Error message: {}", e.getMessage()))
+                .onErrorResume(s -> {
+                    log.info("Inside the On Error Resume");
+                    return Mono.just(name);
+                })
+                .log();
+
+        StepVerifier.create(error)
+                .expectNext(name)
+                .verifyComplete();
+    }
+
+    @Test
+    void monoDoOnErrorReturn() {
+        String name = "Carlos Daniel";
+
+        Mono<Object> error = Mono.error(new IllegalArgumentException("Illegal Argument Exception Error"))
+                .onErrorReturn("empty")
+                .doOnError(e -> log.error("Error message: {}", e.getMessage()))
+                .onErrorResume(s -> {
+                    log.info("Inside the On Error Resume");
+                    return Mono.just(name);
+                })
+                .log();
+
+        StepVerifier.create(error)
+                .expectNext("empty")
+                .verifyComplete();
     }
 }
