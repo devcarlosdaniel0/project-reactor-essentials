@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.BaseSubscriber;
+import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -12,7 +13,7 @@ import java.time.Duration;
 import java.util.List;
 
 @Slf4j
-public class FluxTest {
+class FluxTest {
 
     @Test
     void fluxSubscriber() {
@@ -162,7 +163,7 @@ public class FluxTest {
     }
 
     @Test
-    public void fluxSubscriberIntervalTwo() throws Exception {
+    void fluxSubscriberIntervalTwo() throws Exception {
         StepVerifier.withVirtualTime(this::createInterval)
                 .expectSubscription()
                 .expectNoEvent(Duration.ofDays(1))
@@ -177,5 +178,35 @@ public class FluxTest {
     private Flux<Long> createInterval() {
         return Flux.interval(Duration.ofDays(1))
                 .log();
+    }
+
+    @Test
+    void connectableFlux() throws Exception {
+        ConnectableFlux<Integer> connectableFlux = Flux.range(1, 10)
+                .log()
+                .delayElements(Duration.ofMillis(100))
+                .publish();
+
+//        connectableFlux.connect();
+
+//        log.info("Thread sleeping for 300ms");
+//
+//        Thread.sleep(300);
+//
+//        connectableFlux.subscribe(i -> log.info("Sub1 number {}", i));
+//
+//        log.info("Thread sleeping for 200ms");
+//
+//        Thread.sleep(200);
+//
+//        connectableFlux.subscribe(i -> log.info("Sub2 number {}", i));
+
+        StepVerifier
+                .create(connectableFlux)
+                .then(connectableFlux::connect)
+                .thenConsumeWhile(i -> i <= 5)
+                .expectNext(6, 7, 8, 9, 10)
+                .expectComplete()
+                .verify();
     }
 }
