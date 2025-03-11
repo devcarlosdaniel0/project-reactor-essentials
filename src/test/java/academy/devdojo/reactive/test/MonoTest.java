@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @Slf4j
-public class MonoTest {
+class MonoTest {
 
     @Test
     void monoSubscriber() {
