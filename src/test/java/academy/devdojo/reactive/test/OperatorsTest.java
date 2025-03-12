@@ -232,7 +232,7 @@ class OperatorsTest {
     }
 
     @Test
-    void mergeOperator() throws Exception{
+    void mergeOperator() throws Exception {
         Flux<String> flux1 = Flux.just("a", "b").delayElements(Duration.ofMillis(200));
         Flux<String> flux2 = Flux.just("c", "d");
 
@@ -253,7 +253,7 @@ class OperatorsTest {
     }
 
     @Test
-    void mergeWithOperator() throws Exception{
+    void mergeWithOperator() throws Exception {
         Flux<String> flux1 = Flux.just("a", "b").delayElements(Duration.ofMillis(200));
         Flux<String> flux2 = Flux.just("c", "d");
 
